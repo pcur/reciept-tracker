@@ -4,6 +4,7 @@
 ## Installation:
   Running `poetry install` in the project's root directory *should* handle managing the environment and installing all dependencies. NOTE, this requires you to have poetry already installed. Should have a comprehensive list of all dependencies eventually in case you'd like to install manually without a venv, but for now, you at least need:
   - pandas
+  - streamlit
   - google.genai
   - pillow
 ## TODO: 
