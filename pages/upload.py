@@ -1,28 +1,28 @@
 import streamlit as st
 import os
 from config.settings import UPLOAD_FOLDER
-from services.ocr_service import extract_receipt_data
+from services.ocr_service import upload_receipt
 from services.db_service import save_receipt
 
-def render():
-    st.header("📤 Upload a Receipt")
 
-    uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+st.header("📤 Upload a Receipt")
 
-    if uploaded_file:
-        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-        file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
+uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
 
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
+if uploaded_file:
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
 
-        st.image(file_path, caption="Uploaded Receipt", use_column_width=True)
+    with open(file_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
 
-        receipt_data = extract_receipt_data(file_path)
+    st.image(file_path, caption="Uploaded Receipt", use_column_width=True)
 
-        st.subheader("Extracted Data")
-        st.json(receipt_data)
+    receipt_data = upload_receipt(file_path)
 
-        if st.button("Save Receipt"):
-            save_receipt(receipt_data, file_path)
-            st.success("Receipt saved successfully!")
+    st.subheader("Extracted Data")
+    st.json(receipt_data)
+
+    if st.button("Save Receipt"):
+        save_receipt(receipt_data, file_path)
+        st.success("Receipt saved successfully!")
