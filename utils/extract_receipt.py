@@ -28,9 +28,16 @@ def extract_receipt_details(image_path):
     You are a helpful assistant analyzing receipt images.
     Extract the following details from the receipt:
     - Store name
-    - Total amount
     - Purchase date
-    Return the result as a JSON object.
+    - Category of purchase (gas, restaurant, grocery, etc)
+    - Subtotal
+    - Total amount
+    Return the result as a JSON object. Ensure that the structure and name of the keys is as follows:
+    - store_name
+    - purchase_date
+    - category
+    - subtotal
+    - total_amount
     """
 
     try:

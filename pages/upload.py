@@ -24,5 +24,5 @@ if uploaded_file:
     st.json(receipt_data)
 
     if st.button("Save Receipt"):
-        save_receipt(receipt_data, file_path)
+        save_receipt(receipt_data, uploaded_file.name)
         st.success("Receipt saved successfully!")
