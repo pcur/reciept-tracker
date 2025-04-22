@@ -17,4 +17,43 @@ After installation, you can run `streamlit run Dashboard.py` either through `poe
 - Detailed breakdown (spending for each category, pie charts?)
 - Aesthetics
 
+## Directory Breakdown
+
+```
+receipt_tracker/
+
+│
+
+├── Dashboard.py            # "Base" script, landing page dashboard
+
+├── pages/                  # Separate pages like 'Upload', 'Manage', etc
+
+│   └── upload.py
+
+├── services/
+
+│   ├── ocr_service.py      # Handles image uploading and formatting
+│   └── db_service.py       # Handles all database interactions
+
+├── utils/
+
+│   └── extract_reciept.py  # Current Gemini API call
+
+├── models/
+
+│   └── receipt.py          # ORM model definitions (if using SQLAlchemy), unused
+
+├── assets/
+
+│   └── uploads/            # Local receipt image storage (at scale would be hosted online)
+                            # Also currently storage of .json files in lieu of DB
+└── config                 
+
+    ├── .env                # API Keys, private config (git ignored)
+
+    ├── settings.py         # Generic app settings
+
+    └── env.py              # env loader, handles all settings
+
+```
 
