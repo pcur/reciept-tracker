@@ -23,7 +23,8 @@ data = pd.DataFrame(receipts)
 
 # Ensure numeric and date formats
 data["total_amount"] = pd.to_numeric(data["total_amount"], errors="coerce")
-data["purchase_date"] = pd.to_datetime(data["purchase_date"], format="%m/%d/%y", errors="coerce")
+data["purchase_date"] = pd.to_datetime(data["purchase_date"], format="%Y-%m-%d %H:%M:%S", errors="coerce")
+
 
 # Drop missing/invalid
 data = data.dropna(subset=["total_amount", "category"])

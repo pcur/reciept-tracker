@@ -28,7 +28,7 @@ def extract_receipt_details(image_path):
     You are a helpful assistant analyzing receipt images.
     Extract the following details from the receipt:
     - Store name
-    - Purchase date
+    - Purchase date (in strict format of YYYY-MM-DD HH:MM:SS, default to current values for any unknown, for example if year or time is not shown)
     - Category of purchase (gas, restaurant, grocery, etc)
     - Subtotal
     - Total amount
