@@ -2,11 +2,15 @@ import streamlit as st
 import os
 import json
 from datetime import datetime
-from services.db_service import get_all_receipts
+from services.db_service import get_all_receipts, save_receipt_update, delete_receipt
 from config.settings import UPLOAD_FOLDER
 
 st.header("📊 Receipt History")
+if st.session_state.get("new_upload", False):
+    st.session_state.new_upload = False  # Reset the flag
+    st.rerun()  # Force a full rerun
 
+# -- Always get fresh receipts
 receipts = get_all_receipts()
 
 if not receipts:
@@ -20,15 +24,6 @@ def parse_date(date_str):
     except Exception:
         return datetime.min
 
-# -- Utility to save updated receipt
-def save_receipt_update(receipt, filename):
-    file_path = os.path.join(UPLOAD_FOLDER, filename)
-    try:
-        with open(file_path, "w") as f:
-            json.dump(receipt, f, indent=4)
-    except Exception as e:
-        st.error(f"Failed to save receipt: {e}")
-
 # -- Sorting dropdown
 sort_options = {
     "Date (Newest First)": lambda r: parse_date(r.get("purchase_date", "")),
@@ -39,7 +34,6 @@ sort_options = {
 }
 
 sort_choice = st.selectbox("Sort receipts by", list(sort_options.keys()))
-
 reverse_sort = sort_choice not in ["Date (Oldest First)", "Total Amount (Low to High)"]
 receipts = sorted(receipts, key=sort_options[sort_choice], reverse=reverse_sort)
 
@@ -47,7 +41,7 @@ receipts = sorted(receipts, key=sort_options[sort_choice], reverse=reverse_sort)
 if "edit_mode" not in st.session_state:
     st.session_state.edit_mode = {}
 
-# -- Display custom receipt entries
+# -- Display receipt entries
 for idx, receipt in enumerate(receipts):
     image_name = receipt.get("image_name", "")
     expander_label = f"🧾 {receipt.get('store_name', 'Unknown')} — {receipt.get('purchase_date', 'Unknown')}"
@@ -72,23 +66,23 @@ for idx, receipt in enumerate(receipts):
             payment_type = cols[1].text_input("Payment Type", receipt.get("payment_type", ""), key=f"payment_{idx}")
 
             if cols[1].button("Save Changes", key=f"save_{idx}"):
-                # Update the receipt
                 receipt["store_name"] = store_name
                 receipt["purchase_date"] = purchase_date
-                receipt["category_of_purchase"] = category
+                receipt["category"] = category
                 receipt["subtotal"] = subtotal
                 receipt["total_amount"] = total_amount
                 receipt["payment_type"] = payment_type
 
-                save_receipt_update(receipt, image_name.replace(".png", ".json").replace(".jpg", ".json").replace(".jpeg", ".json"))
+                save_receipt_update(receipt, image_name.removesuffix(".jpg"))
+
                 st.success("Receipt updated!")
-                st.session_state.edit_mode[image_name] = False  # Turn off edit mode
+                st.session_state.edit_mode[image_name] = False
+                st.rerun()
 
             if cols[1].button("Cancel", key=f"cancel_{idx}"):
-                st.session_state.edit_mode[image_name] = False  # Cancel editing
+                st.session_state.edit_mode[image_name] = False
 
         else:
-            # Read-only display
             cols[1].markdown(f"**Store:** {receipt.get('store_name', 'N/A')}")
             cols[1].markdown(f"**Date:** {receipt.get('purchase_date', 'N/A')}")
             cols[1].markdown(f"**Category:** {receipt.get('category', 'N/A')}")
@@ -98,6 +92,13 @@ for idx, receipt in enumerate(receipts):
 
             if cols[1].button("Edit", key=f"edit_{idx}"):
                 st.session_state.edit_mode[image_name] = True
+
+            if cols[1].button("Delete", key=f"delete_{idx}"):
+                # Call delete function
+                delete_receipt(image_name.removesuffix(".jpg"))
+                st.success(f"Receipt deleted!")
+                st.rerun()  # Refresh page after deletion
+
 
 # -- Total amount
 total_spent = sum(

@@ -6,14 +6,11 @@ from config.settings import UPLOAD_FOLDER
 def save_receipt(data, image_name):
     # Ensure the upload folder exists
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    image_base = os.path.splitext(image_name)[0]
     # Add image name to the data
-    data["image_name"] = image_name
+    data["image_name"] = image_name + ".jpg"
 
-    # Use store name directly
-    store_name = data.get("store_name", "unknown_store")
     # Create a JSON filename based on the image name (e.g., Walmart_20210726.json)
-    json_filename = f"{store_name}_{image_base}.json"
+    json_filename = f"{image_name}.json"
     json_path = os.path.join(UPLOAD_FOLDER, json_filename)
 
     # Write the dictionary to the JSON file
@@ -22,6 +19,15 @@ def save_receipt(data, image_name):
 
     print(f"Receipt data saved to {json_path}")
 
+def save_receipt_update(receipt, filename):
+    json_filename = os.path.splitext(filename)[0] + ".json"  # ensure .json extension
+    file_path = os.path.join(UPLOAD_FOLDER, json_filename)
+    try:
+        with open(file_path, "w") as f:
+            json.dump(receipt, f, indent=4)
+    except Exception as e:
+        st.error(f"Failed to save receipt: {e}")
+        
 def get_all_receipts():
     receipts = []
 
@@ -39,3 +45,14 @@ def get_all_receipts():
                 print(f"Error loading {file_name}: {e}")
 
     return receipts
+
+def delete_receipt(image_name_without_extension):
+    # Assuming receipts are stored as JSON and images
+    receipt_path = os.path.join(UPLOAD_FOLDER, f"{image_name_without_extension}.json")
+    image_path = os.path.join(UPLOAD_FOLDER, f"{image_name_without_extension}.jpg")
+    
+    if os.path.exists(receipt_path):
+        os.remove(receipt_path)
+    
+    if os.path.exists(image_path):
+        os.remove(image_path)

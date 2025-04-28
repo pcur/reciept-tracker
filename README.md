@@ -28,7 +28,8 @@ receipt_tracker/
 
 ├── pages/                  # Separate pages like 'Upload', 'Manage', etc
 
-│   └── upload.py
+|   ├── Receipt History.py
+│   └── Upload.py
 
 ├── services/
 
